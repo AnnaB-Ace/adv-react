@@ -1,23 +1,24 @@
 import { Suspense } from "react";
-import { BrowserRouter } from "react-router-dom";
-import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import { routes } from "../01-Lazyload/routes/routes";
 import logo from "../assest/logo.svg";
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  NavLink,
+  Redirect,
+} from "react-router-dom";
 export const Navigation = () => {
   return (
-    <Suspense fallback={<span>loading</span>}>
-      <BrowserRouter>
+    <Suspense fallback={<span>Loading...</span>}>
+      <Router>
         <div className="main-layout">
           <nav>
             <img src={logo} alt="React Logo" />
             <ul>
-              {routes.map(({ to, name }) => (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    className={({ isActive }) => (isActive ? "nav-active" : "")}
-                  >
+              {routes.map(({ path, name }) => (
+                <li key={path}>
+                  <NavLink to={path} activeClassName="nav-active" exact>
                     {name}
                   </NavLink>
                 </li>
@@ -25,14 +26,17 @@ export const Navigation = () => {
             </ul>
           </nav>
 
-          <Routes>
+          {/* A <Switch> looks through its children <Route>s and
+              renders the first one that matches the current URL. */}
+          <Switch>
             {routes.map(({ path, Component }) => (
-              <Route key={path} path={path} element={<Component />} />
+              <Route key={path} path={path} render={() => <Component />} />
             ))}
-            <Route path="/*" element={<Navigate to={routes[0].to} replace />} />
-          </Routes>
+
+            <Redirect to={routes[0].path} />
+          </Switch>
         </div>
-      </BrowserRouter>
+      </Router>
     </Suspense>
   );
 };
